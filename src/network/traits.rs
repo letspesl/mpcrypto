@@ -20,7 +20,7 @@ pub struct NetInfo {
 }
 
 pub trait Net {
-    fn new(total_clients: usize, parties: Vec<String>) -> Self;
+    fn new(protocol_name: String, total_clients: usize, parties: Vec<String>) -> Self;
 
     fn send<T>(&self, send_type: SendType, path: &str, round: &str, data: T) -> Result<(), ()> where T: serde::ser::Serialize;
     fn receive(&self, receive_type: ReceiveType, path: &str, round: &str) -> Result<Vec<String>, Error>;

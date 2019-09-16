@@ -177,7 +177,7 @@ pub struct PartySignup {
 }
 
 impl Net for ClientToServer {
-    fn new(total_clients: usize, parties: Vec<String>) -> ClientToServer {
+    fn new(protocol_name: String, total_clients: usize, parties: Vec<String>) -> ClientToServer {
         let mut net = ClientToServer {
             client: Client::new(),
             addr: parties[0].clone(),
@@ -193,7 +193,7 @@ impl Net for ClientToServer {
 
         let key = TupleKey {
             first: "signup".to_string(),
-            second: "keygen".to_string(),
+            second: protocol_name.clone(),
             third: "".to_string(),
             fourth: "".to_string(),
         };
@@ -203,7 +203,7 @@ impl Net for ClientToServer {
             value: total_clients.to_string()
         };
 
-        let res_body = net.post("signupkeygen", &entry).unwrap();
+        let res_body = net.post("signup", &entry).unwrap();
         let result: Result<(PartySignup), ()> = serde_json::from_str(&res_body).unwrap();
         assert!(result.is_ok());
 
