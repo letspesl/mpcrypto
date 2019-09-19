@@ -6,6 +6,7 @@ extern crate serde_json;
 
 pub mod computation;
 pub mod network;
+pub mod blockchain;
 pub mod wrap;
 
 #[derive(Copy, PartialEq, Eq, Clone, Debug)]

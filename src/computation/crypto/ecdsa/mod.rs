@@ -1,44 +1,38 @@
-extern crate multi_party_ecdsa;
-
-use multi_party_ecdsa::protocols::multi_party_ecdsa::gg_2018::party_i::*;
-use multi_party_ecdsa::protocols::multi_party_ecdsa::gg_2018::mta::*;
-
+extern crate hex;
+extern crate rust_crypto;
 extern crate curv;
 extern crate paillier;
+extern crate multi_party_ecdsa;
 
-use paillier::EncryptionKey;
-use curv::cryptographic_primitives::secret_sharing::feldman_vss::VerifiableSS;
-
-////////////////////////////////////////////////////////////////////////////
-// commit message aes encryption
-extern crate rust_crypto;
 use rust_crypto::aead::AeadEncryptor;
 use rust_crypto::aead::AeadDecryptor;
 use rust_crypto::aes::KeySize::KeySize256;
 use rust_crypto::aes_gcm::AesGcm;
+
+use curv::cryptographic_primitives::secret_sharing::feldman_vss::VerifiableSS;
+use curv::cryptographic_primitives::proofs::sigma_dlog::DLogProof;
+use curv::cryptographic_primitives::proofs::sigma_correct_homomorphic_elgamal_enc::HomoELGamalProof;
+use curv::arithmetic::traits::Converter;
+use curv::elliptic::curves::traits::*;
+use curv::BigInt;
+use curv::{FE, GE};
+
+use paillier::EncryptionKey;
+
+use std::iter::repeat;
+
+use multi_party_ecdsa::protocols::multi_party_ecdsa::gg_2018::party_i::*;
+use multi_party_ecdsa::protocols::multi_party_ecdsa::gg_2018::mta::*;
+
+use crate::network::traits::*;
+use crate::network::c2s::*;
+use super::traits::{Key, Sign};
+
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct AEAD {
     pub ciphertext: Vec<u8>,
     pub tag: Vec<u8>,
 }
-
-use curv::BigInt;
-use curv::{FE, GE};
-use curv::cryptographic_primitives::proofs::sigma_dlog::DLogProof;
-use curv::cryptographic_primitives::proofs::sigma_correct_homomorphic_elgamal_enc::HomoELGamalProof;
-
-use curv::arithmetic::traits::Converter; // BigInt::to_vec
-use curv::elliptic::curves::traits::*;  //ECPoint.x_coor()
-
-use std::iter::repeat;
-
-extern crate hex;
-
-////////////////////////////////////////////////////////////////////////////
-
-use crate::network::traits::*;
-use crate::network::c2s::*;
-use super::traits::{Key, Sign};
 
 #[derive(Serialize, Deserialize)]
 pub struct EcdsaKey {
@@ -257,8 +251,9 @@ impl Key for EcdsaKey {
         key.unwrap()
     }
 
-    fn from_backup(input: String) -> Self {
-        serde_json::from_str(&input).unwrap()
+    fn from_backup(input: String) -> EcdsaKey {
+        let key: EcdsaKey = serde_json::from_str(&input).unwrap();
+        key
     }
 
     fn get_backup(&self) -> String {
@@ -276,6 +271,7 @@ impl Key for EcdsaKey {
 
 #[derive(Serialize, Deserialize)]
 pub struct EcdsaSign {
+    pub message: String,
     pub signature: Signature
 }
 
@@ -488,10 +484,11 @@ impl EcdsaSign {
         let R = R + decomm_i.g_gamma_i * &delta_inv;
 
         // we assume the message is already hashed (by the signer).
-        let message_decoded = match hex::decode(message.clone()) {
-            Ok(x) => x,
-            Err(_e) => message.as_bytes().to_vec(),
-        };
+        let message_decoded = message.as_bytes().to_vec();
+        // match hex::decode(message.clone()) {
+        //     Ok(x) => x,
+        //     Err(_e) => message.as_bytes().to_vec(),
+        // };
         let message_arr = &message_decoded[..];
         let message_bn = BigInt::from(message_arr);
         let two = BigInt::from(2);
@@ -603,6 +600,7 @@ impl EcdsaSign {
             .expect("verification failed");
       
         EcdsaSign {
+            message: message.to_string(),
             signature: Signature {
                 r: sig.r.clone(),
                 s: sig.s.clone()

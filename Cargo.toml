@@ -28,13 +28,15 @@ crate-type = ["lib"]
 multi-party-ecdsa = { git = "https://github.com/KZen-networks/multi-party-ecdsa" }
 paillier = { git = "https://github.com/KZen-networks/rust-paillier", tag = "v0.3.0" }
 
+rust-crypto = { package = "rust-crypto", version = "^0.2" }
+hex = "0.3.2"
 serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"
 reqwest = { version = "0.9.5", default-features = false }
 
-rust-crypto = { package = "rust-crypto", version = "^0.2" }
-hex = "0.3.2"
+base58 = "0.1"
+ripemd160 = "*"
 
 [dependencies.curv]
 git = "https://github.com/KZen-networks/curv"

@@ -1,5 +1,6 @@
 use crate::computation::crypto::traits::Sign;
 use crate::computation::crypto::ecdsa::{EcdsaKey, EcdsaSign};
+use crate::blockchain::*;
 use crate::CryptoType;
 
 #[derive(Serialize, Deserialize)]
@@ -28,6 +29,8 @@ pub fn generate_sign(input_str: &str) -> String {
                 input.parties, 
                 input.threshold
             );
+            let signed_msg = eos::get_signed_msg(&ecdsa_sign);
+            println!("generate_sign: {:?}", signed_msg);
             ecdsa_sign.to_string()
         },
         CryptoType::EDDSA => {
