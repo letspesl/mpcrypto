@@ -27,8 +27,8 @@ pub fn get_public_key(ecdsa_key: &EcdsaKey) -> String {
 }
 
 pub fn get_signed_msg(ecdsa_sig: &EcdsaSign) -> String {
-    let r = &((&ecdsa_sig.signature.r.get_element())[..]);
-    let s = &((&ecdsa_sig.signature.s.get_element())[..]);
+    let r = &((&ecdsa_sig.r.get_element())[..]);
+    let s = &((&ecdsa_sig.s.get_element())[..]);
 
     let rs_vec = [r, s].concat();
 

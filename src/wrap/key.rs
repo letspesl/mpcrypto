@@ -4,7 +4,7 @@ use crate::blockchain::*;
 use crate::CryptoType;
 use crate::ChainType;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct KeyGenerateInput {
     pub crypto_type: CryptoType,
     pub chain_type: ChainType,
@@ -13,7 +13,7 @@ pub struct KeyGenerateInput {
     pub threshold: usize
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct KeyGenerateOutput {
     pub public_key: String,
     pub shares: String
@@ -25,8 +25,8 @@ pub fn generate_key(input_str: &str) -> String {
     match input.crypto_type {
         CryptoType::ECDSA => {
             let ecdsa_key: EcdsaKey = Key::new(
-                input.parties, 
-                input.share_count, 
+                input.parties,
+                input.share_count,
                 input.threshold
             );
             

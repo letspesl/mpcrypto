@@ -274,8 +274,8 @@ impl Key for EcdsaKey {
 
 #[derive(Serialize, Deserialize)]
 pub struct EcdsaSign {
-    pub message: String,
-    pub signature: Signature
+    pub r: FE,
+    pub s: FE
 }
 
 impl EcdsaSign {
@@ -608,11 +608,8 @@ impl EcdsaSign {
             .expect("verification failed");
       
         EcdsaSign {
-            message: message.to_string(),
-            signature: Signature {
-                r: sig.r.clone(),
-                s: sig.s.clone()
-            }
+            r: sig.r.clone(),
+            s: sig.s.clone()
         }
     }
 }

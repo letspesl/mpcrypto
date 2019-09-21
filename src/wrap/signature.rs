@@ -4,7 +4,7 @@ use crate::blockchain::*;
 use crate::CryptoType;
 use crate::ChainType;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SignGenerateInput {
     pub crypto_type: CryptoType,
     pub chain_type: ChainType,
@@ -14,7 +14,7 @@ pub struct SignGenerateInput {
     pub threshold: usize
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SignGenerateOutput {
     pub sign: String,
     pub sign_hex: String
@@ -29,7 +29,7 @@ pub fn generate_sign(input_str: &str) -> String {
             let ecdsa_sign: EcdsaSign = Sign::new(
                 &key,
                 &input.message,
-                input.parties, 
+                input.parties,
                 input.threshold
             );
 
