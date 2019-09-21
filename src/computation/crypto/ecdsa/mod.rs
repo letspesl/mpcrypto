@@ -28,6 +28,9 @@ use crate::network::traits::*;
 use crate::network::c2s::*;
 use super::traits::{Key, Sign};
 
+use rust_crypto::digest::Digest;
+use rust_crypto::sha2::Sha256;
+
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct AEAD {
     pub ciphertext: Vec<u8>,
@@ -483,16 +486,21 @@ impl EcdsaSign {
         // adding local g_gamma_i
         let R = R + decomm_i.g_gamma_i * &delta_inv;
 
-        // we assume the message is already hashed (by the signer).
-        let message_decoded = message.as_bytes().to_vec();
-        // match hex::decode(message.clone()) {
-        //     Ok(x) => x,
-        //     Err(_e) => message.as_bytes().to_vec(),
-        // };
-        let message_arr = &message_decoded[..];
-        let message_bn = BigInt::from(message_arr);
+        // sha256 hasing message (ref. eosjs-ecc)
+        let mut hasher = Sha256::new();
+        hasher.input_str(message);
+        let message_sha256_hex = hasher.result_str();
+
+        // hashed message casting: hex string to u8 array
+        let message_sha256_u8_vec = match hex::decode(&message_sha256_hex) {
+            Ok(x) => x,
+            Err(_e) => message_sha256_hex.as_bytes().to_vec(),
+        };
+        let message_hash_arr = &message_sha256_u8_vec[..];
+
+        let message_bn = BigInt::from(message_hash_arr);
         let two = BigInt::from(2);
-        let message_bn = message_bn.modulus(&two.pow(256));
+        let message_bn = message_bn.modulus(&two.pow(256));        
         let local_sig =
             LocalSignature::phase5_local_sig(&sign_keys.k_i, &message_bn, &R, &sigma, &key.shared_key.y);
 

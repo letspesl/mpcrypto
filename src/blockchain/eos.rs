@@ -32,30 +32,24 @@ pub fn get_signed_msg(ecdsa_sig: &EcdsaSign) -> String {
 
     let rs_vec = [r, s].concat();
 
-    let recover_id = 1;
+    let mut recover_id = 1; // 0~3
+    recover_id += 4 + 27; // 31~34
+
     let mut rsi_vec: Vec<u8> = Vec::new();
-    rsi_vec.push(recover_id+4+27);
+    rsi_vec.push(recover_id);
     rsi_vec.extend_from_slice(&rs_vec[..]);
 
     let rsi_arr = &(rsi_vec.clone())[..];
-    println!("{:?}", rsi_arr);
-    
+
     rsi_vec.extend_from_slice("K1".as_bytes());
 
     let mut hasher = Ripemd160::new();
     hasher.input(&rsi_vec[..].as_ref());
     let checksum = hasher.result();
 
-    let cstmp = &checksum[0..4];
-    println!("{:?}", hex::encode(cstmp));
-
     let rsi_checksum_vec = [&rsi_arr, &checksum[0..4]].concat();
 
     let signed_msg = "SIG_K1_".to_string() + &rsi_checksum_vec.to_base58();
-
-    println!("{:?}", rsi_checksum_vec);
-    println!("{:?}", rsi_checksum_vec.len());
-    println!("{:?}", signed_msg);
 
     signed_msg
 }

@@ -2,7 +2,6 @@
 extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
-//extern crate subtle;
 
 pub mod computation;
 pub mod network;
@@ -19,4 +18,11 @@ pub enum CryptoType {
     ECDSA,
     EDDSA,
     Schnorr,
+}
+
+#[derive(Copy, PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
+pub enum ChainType {
+    EOS,
+    ETH,
+    BTC,
 }
